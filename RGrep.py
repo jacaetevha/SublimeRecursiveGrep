@@ -1,18 +1,25 @@
 import sublime, sublime_plugin
-import commands, os
+import subprocess, os
 
-class GitGrepCommand(sublime_plugin.WindowCommand):
+class RGrepCommand(sublime_plugin.WindowCommand):
     def run(self):
-        self.window.show_input_panel('git grep', '', self.git_grep, None, None)
+        self.window.show_input_panel('grep -rnH', '', self.recursive_grep, None, None)
 
-    def git_grep(self, query):
-        status, base_dir = commands.getstatusoutput('git rev-parse --show-toplevel')
+    def output_and_status(commands):
+        process = subprocess.Popen(commands, stdout=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        status = process.wait()
+        return [stdout, status]
+
+    def recursive_grep(self, query):
+        base_dir, status = output_and_status(['pwd'])
+
         if status != 0:
             sublime.message_dialog(base_dir)
             return
         os.chdir(base_dir)
 
-        status, matches = commands.getstatusoutput('git grep "%s"' % query)
+        matches, status = output_and_status(['grep', '-rnH', query])
         if status != 0:
             sublime.message_dialog(matches)
             return

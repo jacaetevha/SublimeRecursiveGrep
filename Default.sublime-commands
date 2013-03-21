@@ -1,6 +1,6 @@
 [
   {
-    "caption": "Git: Grep",
-    "command": "git_grep"
+    "caption": "Recursive Grep in Project",
+    "command": "Grep: rgrep"
   }
 ]
